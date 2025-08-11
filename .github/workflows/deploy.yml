@@ -1,0 +1,32 @@
+
+name: Release
+on:
+  push:
+    branches: [ "main" ]
+  # pull_request:
+  #   branches: [ "main" ] #[commented blocks are not required (just kept here for reference)]
+
+jobs:
+  deploy:
+
+    runs-on: ubuntu-latest
+
+    # strategy:
+    #   matrix:
+    #     node-version: [18.x, 20.x, 22.x]
+
+    steps:
+    - uses: actions/checkout@v4
+    # - name: Use Node.js ${{ matrix.node-version }}
+    #   uses: actions/setup-node@v4
+    #   with:
+    #     node-version: ${{ matrix.node-version }}
+    #     cache: 'npm'
+    # - name: "Installing dependencies"
+    #   run: npm i
+
+    # - name: "Build command"
+    #   run: npm run build
+    - run: docker build . -t ${{secrets.DOCKERHUB_USERNAME}}/next-js-app
+    - run: echo "${{secrets.DOCKERHUB_PASSWORD}}" | docker login -u ${{secrets.DOCKERHUB_USERNAME}} --password-stdin
+    - run: docker push ${{secrets.DOCKERHUB_USERNAME}}/next-js-app:latest
